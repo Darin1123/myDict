@@ -1,16 +1,18 @@
-import re, sys, json, os
+import re
+import sys
+import json
+import os
 
-
-PUT_REGEX    = '^\\s*put\\s+([^\\s])+\\s+([^\\s])+.*$'
-GET_REGEX    = '^\\s*get\\s+([^\\s])+.*$'
+PUT_REGEX = '^\\s*put\\s+([^\\s])+\\s+([^\\s])+.*$'
+GET_REGEX = '^\\s*get\\s+([^\\s])+.*$'
 DELETE_REGEX = '^\\s*del\\s+([^\\s])+.*$'
 
 DEFAULT_FILE_NAME = 'vocabulary.json'
 
 
 class Main:
-    def __init__(self, controller, fileName = DEFAULT_FILE_NAME):
-        self.__fileName = fileName
+    def __init__(self, controller, file_name=DEFAULT_FILE_NAME):
+        self.__fileName = file_name
         self.__controller = controller
 
     def run(self):
@@ -49,7 +51,7 @@ class Main:
                     print(self.__controller.delete(word))
 
                 else:
-                    if self.__controller.hasKey(cmd):
+                    if self.__controller.has_key(cmd):
                         print(self.__controller.get(cmd))
                     else:
                         print("Unknown cmd: '{}'".format(cmd))
@@ -63,40 +65,40 @@ class Main:
 
 
 class Controller:
-    def __init__(self, dataService, fileName = DEFAULT_FILE_NAME):
-        self.__dataService = dataService
-        self.__fileName = fileName
+    def __init__(self, data_service, file_name=DEFAULT_FILE_NAME):
+        self.__data_service = data_service
+        self.__file_name = file_name
 
-    def setFileName(self, fileName):
-        self.__fileName = fileName
+    def set_file_name(self, file_name):
+        self.__file_name = file_name
 
     def put(self, key, value):
-        return self.__dataService.put(key, value)
+        return self.__data_service.put(key, value)
 
-    def hasKey(self, key):
-        return self.__dataService.hasKey(key)
+    def has_key(self, key):
+        return self.__data_service.has_key(key)
 
     def get(self, key):
-        if self.__dataService.hasKey(key):
-            return self.__dataService.get(key)
+        if self.__data_service.has_key(key):
+            return self.__data_service.get(key)
         return "word '{}' not in dictionary".format(key)
 
     def delete(self, key):
-        return self.__dataService.delete(key)
+        return self.__data_service.delete(key)
 
     def save(self):
-        return self.__dataService.save()
+        return self.__data_service.save()
 
-    def listKeys(self):
-        return self.__dataService.list()
+    def list_keys(self):
+        return self.__data_service.list()
 
 
 class DataService:
-    def __init__(self, fileName = DEFAULT_FILE_NAME):
+    def __init__(self, file_name=DEFAULT_FILE_NAME):
         self.__data = {}
-        self.__fileName = fileName
+        self.__file_name = file_name
         try:
-            filePath = './data/' + fileName
+            filePath = './data/' + file_name
             if not os.path.exists('./data'):
                 print("Initializing data directory")
                 os.mkdir("./data")
@@ -118,17 +120,16 @@ class DataService:
 
         except Exception as e:
             print(e)
-            raise e
             sys.exit(0)
 
-    def hasKey(self, key):
+    def has_key(self, key):
         return key in self.__data
 
     def get(self, key):
         return self.__data[key]
 
     def delete(self, key):
-        if not self.hasKey(key):
+        if not self.has_key(key):
             return "Key '{}' doesn't exist.".format(key)
         self.__data.pop(key)
         return "Success."
@@ -139,25 +140,18 @@ class DataService:
 
     def save(self):
         try:
-            with open('./data/' + self.__fileName, 'w') as fobj:
+            with open('./data/' + self.__file_name, 'w') as fobj:
                 json.dump(self.__data, fobj)
                 return "Success."
         except Exception as e:
             return str(e)
 
     def list(self):
-        res =  "{} words total.\n\n".format(len(self.__data))
+        res = "{} words total.\n\n".format(len(self.__data))
         for key in self.__data:
             res += "{}    {}\n".format(key, self.__data[key])
         return res
 
 
 if __name__ == '__main__':
-    # dataService = DataService()
-    # controller = Controller(dataService)
-    # main = Main(controller)
-    # main.run()
-
     Main(Controller(DataService())).run()
-
-
