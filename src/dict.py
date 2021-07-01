@@ -97,7 +97,14 @@ class DataService:
         self.__fileName = fileName
         try:
             filePath = './data/' + fileName
-            if not os.path.exists(filePath):
+            if not os.path.exists('./data'):
+                print("Initializing data directory")
+                os.mkdir("./data")
+                print('Initializing dictionary...')
+                with open(filePath, 'w') as file:
+                    file.write('{}')
+                    print('Initialization complete.')
+            elif not os.path.exists(filePath):
                 print('Initializing dictionary...')
                 with open(filePath, 'w') as file:
                     file.write('{}')
@@ -111,6 +118,7 @@ class DataService:
 
         except Exception as e:
             print(e)
+            raise e
             sys.exit(0)
 
     def hasKey(self, key):
