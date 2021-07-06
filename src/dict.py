@@ -2,6 +2,7 @@ import re
 import sys
 import json
 import os
+import random
 
 PUT_REGEX = '^\\s*put\\s+([^\\s])+\\s+([^\\s])+.*$'
 GET_REGEX = '^\\s*get\\s+([^\\s])+.*$'
@@ -50,9 +51,24 @@ class Main:
                     word = re.split('\\s+', cmd, maxsplit=1)[1]
                     print(self.__controller.delete(word))
 
+                elif re.match("review", cmd, re.I):
+                    print("review >> Press [Enter]: see the definition.\n" + 
+                            "review >> Enter 'q' to exit.\n")
+                    while True:
+                        word, definition = self.__controller.review()
+                        cmd = input( '"' + word + '" >> ')
+                        if cmd == 'q':
+                            break
+                        else:
+                            input('"' + definition + '"')
+                            print()
+                    print("\nReview session ends.\n")
+
                 else:
                     if self.__controller.has_key(cmd):
                         print(self.__controller.get(cmd))
+                    elif len(cmd.strip()) == 0:
+                        pass
                     else:
                         print("Unknown cmd: '{}'".format(cmd))
                 print()
@@ -91,6 +107,9 @@ class Controller:
 
     def list_keys(self):
         return self.__data_service.list()
+
+    def review(self):
+        return self.__data_service.random()
 
 
 class DataService:
@@ -152,6 +171,9 @@ class DataService:
             res += "{}    {}\n".format(key, self.__data[key])
         return res
 
+    def random(self):
+        word = random.choice(list(self.__data))
+        return (word, self.__data[word])
 
 if __name__ == '__main__':
     Main(Controller(DataService())).run()
