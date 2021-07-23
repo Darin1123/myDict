@@ -28,7 +28,7 @@ class Main:
                     print(self.__controller.save())
 
                 elif re.match("list", cmd, re.I):
-                    print(self.__controller.listKeys())
+                    print(self.__controller.list_keys())
 
                 elif re.match(PUT_REGEX, cmd, re.I):
                     items = re.split('\\s+', cmd, maxsplit=2)
